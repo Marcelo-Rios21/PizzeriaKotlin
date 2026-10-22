@@ -1,16 +1,49 @@
 package org.example
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
-    val name = "Kotlin"
-    //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
-    println("Hello, " + name + "!")
-
-    for (i in 1..5) {
-        //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-        // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        println("i = $i")
+    // Cliente
+    print("Ingrese nombre del cliente: ")
+    val nombreIngresado = readlnOrNull()?.trim()
+    val nombre: String = if (nombreIngresado.isNullOrBlank()) {
+        "No informado"
+    } else {
+        nombreIngresado
     }
+
+    print("Ingrese direccion de entrega: ")
+    val direccionIngresada = readlnOrNull()?.trim()
+    val direccion: String = if (direccionIngresada.isNullOrBlank()) {
+        "No informada"
+    } else {
+        direccionIngresada
+    }
+
+    print("Ingrese telefono del cliente: ")
+    val telefonoIngresado = readlnOrNull()?.trim()
+    val telefono: String = if (
+        telefonoIngresado != null &&
+        telefonoIngresado.matches(Regex("\\+?[0-9]{8,15}"))
+    ) {
+        telefonoIngresado
+    } else {
+        println("Telefono no valido. Se utilizara un valor predeterminado.")
+        "No informado"
+    }
+
+    // Mostrar informacion registrada
+    println("\n=== CLIENTE REGISTRADO ===")
+    println("Nombre: $nombre")
+    println("Direccion: $direccion")
+    println("Telefono: $telefono")
+
+    // Pizza
+    val nombrePizza: String = "Pepperoni"
+    val precioUnitario: Double = 12000.0
+    var ingredientesDisponibles: Int = 10
+
+    // Pedido
+    val idPedido: Int = 1
+    val cantidadPizzas: Int = 2
+    var totalPedido: Double = 0.0
+    var estadoPedido: String = "Pendiente"
 }
