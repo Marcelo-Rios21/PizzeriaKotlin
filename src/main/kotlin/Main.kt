@@ -77,4 +77,38 @@ fun main() {
     println("Subtotal: $subtotalPedido CLP")
     println("Descuento: $descuento CLP")
     println("Total: $totalPedido CLP")
+
+    // Verificacion de stock
+    val resultadoStock: String = if (ingredientesDisponibles >= cantidadPizzas) {
+        ingredientesDisponibles -= cantidadPizzas
+        estadoPedido = "Preparacion"
+        "Pedido confirmado. Ingredientes suficientes."
+    } else {
+        estadoPedido = "Rechazado"
+        "Ingredientes insuficientes. El pedido no puede ser completado."
+    }
+
+    println("\n=== VERIFICACION DE STOCK ===")
+    println(resultadoStock)
+    println("Ingredientes restantes: $ingredientesDisponibles")
+
+    // Asignacion de repartidor
+    val repartidorAsignado: String = if (estadoPedido == "Preparacion") {
+        "Repartidor 1"
+    } else {
+        "Sin asignar"
+    }
+
+    // Resumen final del pedido
+    println("\n=== RESUMEN DEL PEDIDO ===")
+    println("ID del pedido: $idPedido")
+    println("Cliente: $nombre")
+    println("Direccion de entrega: $direccion")
+    println("Telefono: $telefono")
+    println("Pizza: $nombrePizza")
+    println("Precio unitario: $precioUnitario CLP")
+    println("Cantidad de pizzas: $cantidadPizzas")
+    println("Total despues del descuento: $totalPedido CLP")
+    println("Estado: $estadoPedido")
+    println("Repartidor asignado: $repartidorAsignado")
 }
