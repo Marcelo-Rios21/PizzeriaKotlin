@@ -43,7 +43,38 @@ fun main() {
 
     // Pedido
     val idPedido: Int = 1
-    val cantidadPizzas: Int = 2
+
+    print("Ingrese cantidad de pizzas: ")
+    val cantidadIngresada = readlnOrNull()?.toIntOrNull()
+    val cantidadPizzas: Int = if (
+        cantidadIngresada != null && cantidadIngresada > 0
+    ) {
+        cantidadIngresada
+    } else {
+        println("Cantidad no valida. Se utilizara 1 pizza.")
+        1
+    }
+
     var totalPedido: Double = 0.0
     var estadoPedido: String = "Pendiente"
+
+    // Calculo del pedido
+    val subtotalPedido: Double = precioUnitario * cantidadPizzas
+
+    val descuento: Double = if (cantidadPizzas > 3) {
+        subtotalPedido * 0.10
+    } else {
+        0.0
+    }
+
+    totalPedido = subtotalPedido - descuento
+
+    // Mostrar calculo
+    println("\n=== CALCULO DEL PEDIDO ===")
+    println("Pizza: $nombrePizza")
+    println("Precio unitario: $precioUnitario CLP")
+    println("Cantidad: $cantidadPizzas")
+    println("Subtotal: $subtotalPedido CLP")
+    println("Descuento: $descuento CLP")
+    println("Total: $totalPedido CLP")
 }
