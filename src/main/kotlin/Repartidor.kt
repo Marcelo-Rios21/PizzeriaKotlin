@@ -2,7 +2,8 @@ package org.example
 
 class Repartidor(
     nombre: String,
-    contacto: String
+    contacto: String,
+    val posicion: Int = 0
 ) : Usuario(nombre, contacto) {
 
     override fun mostrarContacto(): String {

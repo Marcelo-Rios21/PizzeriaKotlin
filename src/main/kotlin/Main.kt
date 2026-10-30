@@ -1,10 +1,99 @@
 package org.example
 
+import kotlin.math.abs
+
 fun main() {
+    // Producto disponible
+    val producto = try {
+        Producto(
+            "Pepperoni",
+            12000.0,
+            mapOf("Masa" to 1, "Pepperoni" to 1)
+        )
+    } catch (e: IllegalArgumentException) {
+        println("Error al registrar producto: ${e.message}")
+        return
+    }
+
+    // Inventario compartido por todos los pedidos del dia
+    val inventario = mutableMapOf(
+        "Masa" to 10,
+        "Pepperoni" to 10
+    )
+
+    // Posiciones simuladas para calcular cercania
+    val repartidoresDisponibles = listOf(
+        Repartidor("Repartidor 1", "No informado", 2),
+        Repartidor("Repartidor 2", "No informado", 5),
+        Repartidor("Repartidor 3", "No informado", 8)
+    )
+
+    print("Ingrese cantidad de pedidos del dia: ")
+    val cantidadIngresada = readlnOrNull()?.toIntOrNull()
+
+    val cantidadPedidos = if (
+        cantidadIngresada != null && cantidadIngresada > 0
+    ) {
+        cantidadIngresada
+    } else {
+        println("Cantidad no valida. Se registrara 1 pedido.")
+        1
+    }
+
+    // Almacenar los pedidos del dia en un arreglo
+    val pedidosDelDia: Array<Pedido> = Array(cantidadPedidos) { indice ->
+        registrarPedido(
+            indice + 1,
+            producto,
+            inventario,
+            repartidoresDisponibles
+        )
+    }
+
+    // Reporte general mediante for
+    println("\n=== PEDIDOS DEL DIA ===")
+
+    for (pedido in pedidosDelDia) {
+        println(
+            "Pedido ${pedido.id} | " +
+            "Cliente: ${pedido.cliente.nombre} | " +
+            "Pizzas: ${pedido.productos.size} | " +
+            "Total: ${pedido.calcularTotal()} CLP | " +
+            "Estado: ${pedido.estado}"
+        )
+    }
+
+    // Agrupar segun el estado de preparacion
+    val completados = pedidosDelDia.filter {
+        it.estado == "Listo" || it.estado == "En camino"
+    }
+
+    val pendientes = pedidosDelDia.filter {
+        it.estado == "En preparación"
+    }
+
+    val rechazados = pedidosDelDia.filter {
+        it.estado == "Rechazado"
+    }
+
+    println("\n=== CLASIFICACION DE PEDIDOS ===")
+    println("Preparacion completada: ${completados.size}")
+    println("Pendientes de preparacion: ${pendientes.size}")
+    println("Rechazados: ${rechazados.size}")
+}
+
+fun registrarPedido(
+    idPedido: Int,
+    producto: Producto,
+    inventario: MutableMap<String, Int>,
+    repartidoresDisponibles: List<Repartidor>
+): Pedido {
+    println("\n=== REGISTRO DEL PEDIDO $idPedido ===")
+
     // Cliente
     print("Ingrese nombre del cliente: ")
     val nombreIngresado = readlnOrNull()?.trim()
-    val nombre: String = if (nombreIngresado.isNullOrBlank()) {
+    val nombre = if (nombreIngresado.isNullOrBlank()) {
         "No informado"
     } else {
         nombreIngresado
@@ -12,7 +101,7 @@ fun main() {
 
     print("Ingrese direccion de entrega: ")
     val direccionIngresada = readlnOrNull()?.trim()
-    val direccion: String = if (direccionIngresada.isNullOrBlank()) {
+    val direccion = if (direccionIngresada.isNullOrBlank()) {
         "No informada"
     } else {
         direccionIngresada
@@ -20,119 +109,189 @@ fun main() {
 
     print("Ingrese telefono del cliente: ")
     val telefonoIngresado = readlnOrNull()?.trim()
-    val telefono: String = if (
+
+    val telefono = if (
         telefonoIngresado != null &&
         telefonoIngresado.matches(Regex("\\+?[0-9]{8,15}"))
     ) {
         telefonoIngresado
     } else {
         println("Telefono no valido. Se utilizara un valor predeterminado.")
-        "No informado"
+        "(000) 000-0000"
     }
 
-    val cliente = Cliente(nombre, direccion, telefono, "correo@invalido.com")
+    print("Ingrese correo electronico del cliente: ")
+    val correoIngresado = readlnOrNull()?.trim()
 
-    // Mostrar informacion registrada
+    val correo = if (
+        correoIngresado != null &&
+        correoIngresado.matches(
+            Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
+        )
+    ) {
+        correoIngresado
+    } else {
+        println("Correo no valido. Se utilizara un valor predeterminado.")
+        "correo@invalido.com"
+    }
+
+    val cliente = Cliente(nombre, direccion, telefono, correo)
+
     println("\n=== CLIENTE REGISTRADO ===")
     println("Nombre: ${cliente.nombre}")
     println("Direccion: ${cliente.direccion}")
     println("Telefono: ${cliente.telefono}")
+    println("Correo: ${cliente.correo}")
 
-    // Pizza
-    val producto = Producto(
-        "Pepperoni",
-        12000.0,
-        mapOf("Masa" to 1, "Pepperoni" to 1)
-    )
-
-    val inventario = mutableMapOf(
-        "Masa" to 10,
-        "Pepperoni" to 10
-    )
-
-    // Pedido
-    val idPedido: Int = 1
-
+    // Cantidad de pizzas
     print("Ingrese cantidad de pizzas: ")
-    val cantidadIngresada = readlnOrNull()?.toIntOrNull()
-    val cantidadPizzas: Int = if (
-        cantidadIngresada != null && cantidadIngresada > 0
+    val pizzasIngresadas = readlnOrNull()?.toIntOrNull()
+
+    val cantidadPizzas = if (
+        pizzasIngresadas != null && pizzasIngresadas > 0
     ) {
-        cantidadIngresada
+        pizzasIngresadas
     } else {
         println("Cantidad no valida. Se utilizara 1 pizza.")
         1
     }
 
+    // Notas opcionales
+    print("Ingrese notas del pedido (opcional): ")
+    val notas = readlnOrNull()?.trim()?.takeIf { it.isNotEmpty() }
+
     val pedido = Pedido(
         idPedido,
         cliente,
-        List(cantidadPizzas) { producto }
+        List(cantidadPizzas) { producto },
+        notas
     )
 
-    // Calculo del pedido
-    val subtotalPedido: Double = pedido.subtotal
-    val descuento: Double = pedido.descuento
-    val impuestos: Double = pedido.impuestos
-    val totalPedido: Double = pedido.calcularTotal()
-
-    // Mostrar calculo
+    // Calculos centralizados en Pedido
     println("\n=== CALCULO DEL PEDIDO ===")
     println("Pizza: ${producto.nombre}")
     println("Precio unitario: ${producto.precio} CLP")
     println("Cantidad: $cantidadPizzas")
-    println("Subtotal: $subtotalPedido CLP")
-    println("Descuento: $descuento CLP")
-    println("Impuestos: $impuestos CLP")
-    println("Total: $totalPedido CLP")
+    println("Subtotal: ${pedido.subtotal} CLP")
+    println("Descuento: ${pedido.descuento} CLP")
+    println("Impuestos: ${pedido.impuestos} CLP")
+    println("Total: ${pedido.calcularTotal()} CLP")
 
-    // Verificacion de stock
+    // Inventario compartido
     println("\n=== VERIFICACION DE STOCK ===")
 
-    val stockSuficiente = actualizarInventario(
-        producto.ingredientes,
-        cantidadPizzas,
-        inventario
-    )
-
-    val resultadoStock: String = if (stockSuficiente) {
-        pedido.cambiarEstado("Preparacion")
-        "Pedido confirmado. Ingredientes suficientes."
-    } else {
-        pedido.cambiarEstado("Rechazado")
-        "Ingredientes insuficientes. El pedido no puede ser completado."
+    val stockSuficiente = try {
+        actualizarInventario(
+            producto.ingredientes,
+            cantidadPizzas,
+            inventario
+        )
+    } catch (e: IllegalArgumentException) {
+        println("Error de inventario: ${e.message}")
+        false
     }
 
-    println(resultadoStock)
+    var repartidorAsignado: Repartidor? = null
+
+    if (stockSuficiente) {
+        pedido.cambiarEstado("En preparación")
+        println("Pedido confirmado. Ingredientes suficientes.")
+
+        // Ubicacion numerica simulada: 0 a 10
+        print("Ingrese posicion de entrega (0 a 10): ")
+        val posicionIngresada = readlnOrNull()?.toIntOrNull()
+
+        val posicionEntrega = if (
+            posicionIngresada != null && posicionIngresada in 0..10
+        ) {
+            posicionIngresada
+        } else {
+            println("Posicion no valida. Se utilizara la posicion 5.")
+            5
+        }
+
+        // Buscar el repartidor con menor distancia
+        val distanciaMinima = repartidoresDisponibles.minOfOrNull {
+            abs(it.posicion - posicionEntrega)
+        }
+
+        repartidorAsignado = repartidoresDisponibles.find {
+            distanciaMinima != null &&
+                abs(it.posicion - posicionEntrega) == distanciaMinima
+        }
+
+        println("Seleccione estado del pedido:")
+        println("1. En preparación")
+        println("2. Listo")
+        println("3. En camino")
+        print("Opcion: ")
+
+        val opcionesPermitidas: Set<String> = setOf("1", "2", "3")
+        val opcionIngresada = readlnOrNull()?.trim()
+
+        val opcionEstado = opcionIngresada?.takeIf {
+            it in opcionesPermitidas
+        } ?: "1"
+
+        when (opcionEstado) {
+            "2" -> pedido.cambiarEstado("Listo")
+
+            "3" -> {
+                if (repartidorAsignado != null) {
+                    repartidorAsignado.entregarPedido(pedido)
+                } else {
+                    pedido.cambiarEstado("Listo")
+                }
+            }
+
+            else -> pedido.cambiarEstado("En preparación")
+        }
+    } else {
+        pedido.cambiarEstado("Rechazado")
+        println("Ingredientes insuficientes. El pedido no puede ser completado.")
+    }
+
     println("Inventario restante:")
 
     for ((ingrediente, cantidad) in inventario) {
         println("$ingrediente: $cantidad")
     }
 
-    // Asignacion de repartidor
-    val repartidor = Repartidor("Repartidor 1", "No informado")
-    val repartidorAsignado: String = if (pedido.estado == "Preparacion") {
-        repartidor.nombre
-    } else {
-        "Sin asignar"
+    mostrarResumenPedido(pedido, repartidorAsignado)
+
+    // Simular notificacion al correo valido
+    cliente.correo.takeIf { it != "correo@invalido.com" }?.let { correoValido ->
+        println(
+            "Notificacion simulada a $correoValido: " +
+            "pedido ${pedido.id} - ${pedido.estado}"
+        )
     }
 
-    // Resumen final del pedido
+    return pedido
+}
+
+fun mostrarResumenPedido(
+    pedido: Pedido,
+    repartidor: Repartidor?
+) {
+    val producto = pedido.productos.first()
+
     println("\n=== RESUMEN DEL PEDIDO ===")
     println("ID del pedido: ${pedido.id}")
     println("Cliente: ${pedido.cliente.nombre}")
     println("Direccion de entrega: ${pedido.cliente.direccion}")
     println("Telefono: ${pedido.cliente.telefono}")
+    println("Correo: ${pedido.cliente.correo}")
+    println("Notas: ${pedido.notas ?: "Sin notas"}")
     println("Pizza: ${producto.nombre}")
     println("Precio unitario: ${producto.precio} CLP")
-    println("Cantidad de pizzas: $cantidadPizzas")
-    println("Subtotal: $subtotalPedido CLP")
-    println("Descuento: $descuento CLP")
-    println("Impuestos: $impuestos CLP")
-    println("Total final: $totalPedido CLP")
+    println("Cantidad de pizzas: ${pedido.productos.size}")
+    println("Subtotal: ${pedido.subtotal} CLP")
+    println("Descuento: ${pedido.descuento} CLP")
+    println("Impuestos: ${pedido.impuestos} CLP")
+    println("Total final: ${pedido.calcularTotal()} CLP")
     println("Estado: ${pedido.estado}")
-    println("Repartidor asignado: $repartidorAsignado")
+    println("Repartidor asignado: ${repartidor?.nombre ?: "Sin asignar"}")
 }
 
 fun actualizarInventario(
@@ -140,6 +299,10 @@ fun actualizarInventario(
     cantidadPizzas: Int,
     inventario: MutableMap<String, Int>
 ): Boolean {
+    require(inventario.values.all { it >= 0 }) {
+        "El inventario no puede contener cantidades negativas."
+    }
+
     // Calcular ingredientes necesarios para el lote
     val necesarios = ingredientesPorPizza.mapValues { (_, unidades) ->
         unidades * cantidadPizzas

@@ -3,7 +3,8 @@ package org.example
 class Pedido(
     val id: Int,
     val cliente: Cliente,
-    val productos: List<Producto>
+    val productos: List<Producto>,
+    val notas: String? = null
 ) {
     var estado: String = "Pendiente"
         private set
