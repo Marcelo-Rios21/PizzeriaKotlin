@@ -30,15 +30,20 @@ fun main() {
         "No informado"
     }
 
+    val cliente = Cliente(nombre, direccion, telefono, "correo@invalido.com")
+
     // Mostrar informacion registrada
     println("\n=== CLIENTE REGISTRADO ===")
-    println("Nombre: $nombre")
-    println("Direccion: $direccion")
-    println("Telefono: $telefono")
+    println("Nombre: ${cliente.nombre}")
+    println("Direccion: ${cliente.direccion}")
+    println("Telefono: ${cliente.telefono}")
 
     // Pizza
-    val nombrePizza: String = "Pepperoni"
-    val precioUnitario: Double = 12000.0
+    val producto = Producto(
+        "Pepperoni",
+        12000.0,
+        mapOf("Pepperoni" to 1)
+    )
     var ingredientesDisponibles: Int = 10
 
     // Pedido
@@ -55,11 +60,14 @@ fun main() {
         1
     }
 
-    var totalPedido: Double = 0.0
-    var estadoPedido: String = "Pendiente"
+    val pedido = Pedido(
+        idPedido,
+        cliente,
+        List(cantidadPizzas) { producto }
+    )
 
     // Calculo del pedido
-    val subtotalPedido: Double = precioUnitario * cantidadPizzas
+    val subtotalPedido: Double = pedido.calcularTotal()
 
     val descuento: Double = if (cantidadPizzas > 3) {
         subtotalPedido * 0.10
@@ -67,12 +75,12 @@ fun main() {
         0.0
     }
 
-    totalPedido = subtotalPedido - descuento
+    val totalPedido: Double = subtotalPedido - descuento
 
     // Mostrar calculo
     println("\n=== CALCULO DEL PEDIDO ===")
-    println("Pizza: $nombrePizza")
-    println("Precio unitario: $precioUnitario CLP")
+    println("Pizza: ${producto.nombre}")
+    println("Precio unitario: ${producto.precio} CLP")
     println("Cantidad: $cantidadPizzas")
     println("Subtotal: $subtotalPedido CLP")
     println("Descuento: $descuento CLP")
@@ -81,10 +89,10 @@ fun main() {
     // Verificacion de stock
     val resultadoStock: String = if (ingredientesDisponibles >= cantidadPizzas) {
         ingredientesDisponibles -= cantidadPizzas
-        estadoPedido = "Preparacion"
+        pedido.cambiarEstado("Preparacion")
         "Pedido confirmado. Ingredientes suficientes."
     } else {
-        estadoPedido = "Rechazado"
+        pedido.cambiarEstado("Rechazado")
         "Ingredientes insuficientes. El pedido no puede ser completado."
     }
 
@@ -93,22 +101,23 @@ fun main() {
     println("Ingredientes restantes: $ingredientesDisponibles")
 
     // Asignacion de repartidor
-    val repartidorAsignado: String = if (estadoPedido == "Preparacion") {
-        "Repartidor 1"
+    val repartidor = Repartidor("Repartidor 1", "No informado")
+    val repartidorAsignado: String = if (pedido.estado == "Preparacion") {
+        repartidor.nombre
     } else {
         "Sin asignar"
     }
 
     // Resumen final del pedido
     println("\n=== RESUMEN DEL PEDIDO ===")
-    println("ID del pedido: $idPedido")
-    println("Cliente: $nombre")
-    println("Direccion de entrega: $direccion")
-    println("Telefono: $telefono")
-    println("Pizza: $nombrePizza")
-    println("Precio unitario: $precioUnitario CLP")
+    println("ID del pedido: ${pedido.id}")
+    println("Cliente: ${pedido.cliente.nombre}")
+    println("Direccion de entrega: ${pedido.cliente.direccion}")
+    println("Telefono: ${pedido.cliente.telefono}")
+    println("Pizza: ${producto.nombre}")
+    println("Precio unitario: ${producto.precio} CLP")
     println("Cantidad de pizzas: $cantidadPizzas")
     println("Total despues del descuento: $totalPedido CLP")
-    println("Estado: $estadoPedido")
+    println("Estado: ${pedido.estado}")
     println("Repartidor asignado: $repartidorAsignado")
 }
