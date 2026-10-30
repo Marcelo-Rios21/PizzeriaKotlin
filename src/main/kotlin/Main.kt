@@ -42,9 +42,13 @@ fun main() {
     val producto = Producto(
         "Pepperoni",
         12000.0,
-        mapOf("Pepperoni" to 1)
+        mapOf("Masa" to 1, "Pepperoni" to 1)
     )
-    var ingredientesDisponibles: Int = 10
+
+    val inventario = mutableMapOf(
+        "Masa" to 10,
+        "Pepperoni" to 10
+    )
 
     // Pedido
     val idPedido: Int = 1
@@ -67,15 +71,10 @@ fun main() {
     )
 
     // Calculo del pedido
-    val subtotalPedido: Double = pedido.calcularTotal()
-
-    val descuento: Double = if (cantidadPizzas > 3) {
-        subtotalPedido * 0.10
-    } else {
-        0.0
-    }
-
-    val totalPedido: Double = subtotalPedido - descuento
+    val subtotalPedido: Double = pedido.subtotal
+    val descuento: Double = pedido.descuento
+    val impuestos: Double = pedido.impuestos
+    val totalPedido: Double = pedido.calcularTotal()
 
     // Mostrar calculo
     println("\n=== CALCULO DEL PEDIDO ===")
@@ -84,11 +83,19 @@ fun main() {
     println("Cantidad: $cantidadPizzas")
     println("Subtotal: $subtotalPedido CLP")
     println("Descuento: $descuento CLP")
+    println("Impuestos: $impuestos CLP")
     println("Total: $totalPedido CLP")
 
     // Verificacion de stock
-    val resultadoStock: String = if (ingredientesDisponibles >= cantidadPizzas) {
-        ingredientesDisponibles -= cantidadPizzas
+    println("\n=== VERIFICACION DE STOCK ===")
+
+    val stockSuficiente = actualizarInventario(
+        producto.ingredientes,
+        cantidadPizzas,
+        inventario
+    )
+
+    val resultadoStock: String = if (stockSuficiente) {
         pedido.cambiarEstado("Preparacion")
         "Pedido confirmado. Ingredientes suficientes."
     } else {
@@ -96,9 +103,12 @@ fun main() {
         "Ingredientes insuficientes. El pedido no puede ser completado."
     }
 
-    println("\n=== VERIFICACION DE STOCK ===")
     println(resultadoStock)
-    println("Ingredientes restantes: $ingredientesDisponibles")
+    println("Inventario restante:")
+
+    for ((ingrediente, cantidad) in inventario) {
+        println("$ingrediente: $cantidad")
+    }
 
     // Asignacion de repartidor
     val repartidor = Repartidor("Repartidor 1", "No informado")
@@ -117,7 +127,57 @@ fun main() {
     println("Pizza: ${producto.nombre}")
     println("Precio unitario: ${producto.precio} CLP")
     println("Cantidad de pizzas: $cantidadPizzas")
-    println("Total despues del descuento: $totalPedido CLP")
+    println("Subtotal: $subtotalPedido CLP")
+    println("Descuento: $descuento CLP")
+    println("Impuestos: $impuestos CLP")
+    println("Total final: $totalPedido CLP")
     println("Estado: ${pedido.estado}")
     println("Repartidor asignado: $repartidorAsignado")
+}
+
+fun actualizarInventario(
+    ingredientesPorPizza: Map<String, Int>,
+    cantidadPizzas: Int,
+    inventario: MutableMap<String, Int>
+): Boolean {
+    // Calcular ingredientes necesarios para el lote
+    val necesarios = ingredientesPorPizza.mapValues { (_, unidades) ->
+        unidades * cantidadPizzas
+    }
+
+    // Identificar ingredientes insuficientes
+    val faltantes = necesarios.filter { (nombre, cantidad) ->
+        (inventario[nombre] ?: 0) < cantidad
+    }
+
+    return when {
+        faltantes.isNotEmpty() -> {
+            println("Ingredientes insuficientes:")
+
+            for ((nombre, cantidad) in faltantes) {
+                val disponibles = inventario[nombre] ?: 0
+                val diferencia = cantidad - disponibles
+
+                println(
+                    "- $nombre: necesarios $cantidad, " +
+                    "disponibles $disponibles, faltan $diferencia"
+                )
+            }
+
+            println("Pasos para reabastecer:")
+            println("1. Revisar las cantidades faltantes.")
+            println("2. Reponer los ingredientes en el inventario.")
+            println("3. Volver a realizar el pedido.")
+
+            false
+        }
+
+        else -> {
+            for ((nombre, cantidad) in necesarios) {
+                inventario[nombre] = (inventario[nombre] ?: 0) - cantidad
+            }
+
+            true
+        }
+    }
 }

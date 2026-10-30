@@ -8,8 +8,19 @@ class Pedido(
     var estado: String = "Pendiente"
         private set
 
+    val subtotal: Double = productos.sumOf { it.precio }
+
+    val descuento: Double = if (productos.size > 3) {
+        subtotal * 0.10
+    } else {
+        0.0
+    }
+
+    // Tasa de ejemplo: 19% sobre el monto neto con descuento
+    val impuestos: Double = (subtotal - descuento) * 0.19
+
     fun calcularTotal(): Double {
-        return productos.sumOf { it.precio }
+        return subtotal - descuento + impuestos
     }
 
     fun cambiarEstado(nuevoEstado: String) {
