@@ -1,6 +1,6 @@
 # PizzeriaKotlin
 
-Aplicacion de consola desarrollada en Kotlin para gestionar un pedido basico de una pizzeria.
+Aplicacion de consola desarrollada en Kotlin para gestionar pedidos diarios de una pizzeria.
 
 ## Requisitos
 
@@ -23,27 +23,30 @@ Para verificar la compilacion desde PowerShell, ejecutar:
 
 ## Funcionalidades
 
-- Registro del nombre, direccion y telefono del cliente.
-- Validacion de entradas y asignacion de valores predeterminados.
-- Calculo del subtotal segun precio y cantidad de pizzas.
+- Registro de varios pedidos con nombre, direccion, telefono y correo del cliente.
+- Validacion de telefono, correo y entradas con valores predeterminados.
+- Calculo de subtotal, descuento, impuestos y total por pedido.
 - Aplicacion de un descuento del 10% para pedidos de mas de 3 pizzas.
-- Verificacion de ingredientes disponibles.
+- Verificacion de ingredientes disponibles mediante when.
 - Actualizacion del inventario cuando el pedido es confirmado.
-- Asignacion basica de repartidor.
+- Asignacion del repartidor mas cercano mediante posiciones simuladas.
 - Presentacion del resumen final del pedido.
+- Reporte diario y clasificacion de pedidos por estado.
+- Registro de notas opcionales y notificaciones simuladas.
+- Manejo de errores para precios e inventarios invalidos.
 
 ## Datos de ejemplo
 
 - Pizza: Pepperoni.
-- Precio unitario: 12000 CLP.
-- Ingredientes disponibles inicialmente: 10 unidades.
-- Consumo de inventario: 1 unidad por pizza.
+- Precio neto unitario: 12000 CLP.
+- Ingredientes disponibles inicialmente: 10 unidades de Masa y 10 de Pepperoni.
+- Consumo de inventario: 1 unidad de Masa y 1 de Pepperoni por pizza.
+- Impuesto de ejemplo: 19% aplicado despues del descuento.
 
 ## Alcance
 
-El programa procesa un pedido por ejecucion.
+El programa procesa varios pedidos por ejecucion.
 
-El identificador del pedido es un valor fijo de ejemplo.
+Los identificadores de pedidos son consecutivos desde 1 en cada ejecucion.
 El inventario se reinicia al iniciar una nueva ejecucion.
 No se utiliza base de datos ni almacenamiento persistente.
-

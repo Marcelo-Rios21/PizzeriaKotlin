@@ -77,9 +77,21 @@ fun main() {
     }
 
     println("\n=== CLASIFICACION DE PEDIDOS ===")
+
     println("Preparacion completada: ${completados.size}")
+    for (pedido in completados) {
+        println("- Pedido ${pedido.id}: ${pedido.cliente.nombre} - ${pedido.estado}")
+    }
+
     println("Pendientes de preparacion: ${pendientes.size}")
+    for (pedido in pendientes) {
+        println("- Pedido ${pedido.id}: ${pedido.cliente.nombre} - ${pedido.estado}")
+    }
+
     println("Rechazados: ${rechazados.size}")
+    for (pedido in rechazados) {
+        println("- Pedido ${pedido.id}: ${pedido.cliente.nombre} - ${pedido.estado}")
+    }
 }
 
 fun registrarPedido(
@@ -138,10 +150,9 @@ fun registrarPedido(
     val cliente = Cliente(nombre, direccion, telefono, correo)
 
     println("\n=== CLIENTE REGISTRADO ===")
-    println("Nombre: ${cliente.nombre}")
+    val usuario: Usuario = cliente
+    println("Contacto: ${usuario.mostrarContacto()}")
     println("Direccion: ${cliente.direccion}")
-    println("Telefono: ${cliente.telefono}")
-    println("Correo: ${cliente.correo}")
 
     // Cantidad de pizzas
     print("Ingrese cantidad de pizzas: ")
@@ -169,8 +180,7 @@ fun registrarPedido(
 
     // Calculos centralizados en Pedido
     println("\n=== CALCULO DEL PEDIDO ===")
-    println("Pizza: ${producto.nombre}")
-    println("Precio unitario: ${producto.precio} CLP")
+    println("Detalle del producto: ${producto.detallarProducto()}")
     println("Cantidad: $cantidadPizzas")
     println("Subtotal: ${pedido.subtotal} CLP")
     println("Descuento: ${pedido.descuento} CLP")
