@@ -299,7 +299,13 @@ fun mostrarResumenPedido(
     println("Subtotal: ${pedido.subtotal} CLP")
     println("Descuento: ${pedido.descuento} CLP")
     println("Impuestos: ${pedido.impuestos} CLP")
-    println("Total final: ${pedido.calcularTotal()} CLP")
+    val etiquetaTotal = if (pedido.estado == "Rechazado") {
+        "Total referencial (pedido rechazado)"
+    } else {
+        "Total final"
+    }
+
+    println("$etiquetaTotal: ${pedido.calcularTotal()} CLP")
     println("Estado: ${pedido.estado}")
     println("Repartidor asignado: ${repartidor?.nombre ?: "Sin asignar"}")
 }
