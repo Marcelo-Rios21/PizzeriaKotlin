@@ -1,10 +1,13 @@
 package org.example
 
+import java.time.LocalDate
+
 class Pedido(
     val id: Int,
     val cliente: Cliente,
     val productos: List<Producto>,
-    val notas: String? = null
+    val notas: String? = null,
+    val fecha: LocalDate = LocalDate.now()
 ) {
     var estado: String = "Pendiente"
         private set
@@ -17,11 +20,24 @@ class Pedido(
         0.0
     }
 
-    // Tasa de ejemplo: 19% sobre el monto neto con descuento
-    val impuestos: Double = (subtotal - descuento) * 0.19
+    // Promocion de ejemplo: diciembre de 2026
+    private val periodoPromocional =
+        LocalDate.of(2026, 12, 1)..LocalDate.of(2026, 12, 31)
+
+    val promocionActiva: Boolean = fecha in periodoPromocional
+
+    val descuentoPromocional: Double = if (promocionActiva) {
+        (subtotal - descuento) * 0.05
+    } else {
+        0.0
+    }
+
+    // Tasa de ejemplo: 19% despues de ambos descuentos
+    val impuestos: Double =
+        (subtotal - descuento - descuentoPromocional) * 0.19
 
     fun calcularTotal(): Double {
-        return subtotal - descuento + impuestos
+        return subtotal - descuento - descuentoPromocional + impuestos
     }
 
     fun cambiarEstado(nuevoEstado: String) {

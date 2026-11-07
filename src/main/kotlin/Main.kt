@@ -122,30 +122,12 @@ fun registrarPedido(
     print("Ingrese telefono del cliente: ")
     val telefonoIngresado = readlnOrNull()?.trim()
 
-    val telefono = if (
-        telefonoIngresado != null &&
-        telefonoIngresado.matches(Regex("\\+?[0-9]{8,15}"))
-    ) {
-        telefonoIngresado
-    } else {
+    val telefono = telefonoIngresado?.let { formatearTelefono(it) } ?: run {
         println("Telefono no valido. Se utilizara un valor predeterminado.")
         "(000) 000-0000"
     }
 
-    print("Ingrese correo electronico del cliente: ")
-    val correoIngresado = readlnOrNull()?.trim()
-
-    val correo = if (
-        correoIngresado != null &&
-        correoIngresado.matches(
-            Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
-        )
-    ) {
-        correoIngresado
-    } else {
-        println("Correo no valido. Se utilizara un valor predeterminado.")
-        "correo@invalido.com"
-    }
+    val correo = solicitarCorreoValido()
 
     val cliente = Cliente(nombre, direccion, telefono, correo)
 
@@ -155,17 +137,7 @@ fun registrarPedido(
     println("Direccion: ${cliente.direccion}")
 
     // Cantidad de pizzas
-    print("Ingrese cantidad de pizzas: ")
-    val pizzasIngresadas = readlnOrNull()?.toIntOrNull()
-
-    val cantidadPizzas = if (
-        pizzasIngresadas != null && pizzasIngresadas > 0
-    ) {
-        pizzasIngresadas
-    } else {
-        println("Cantidad no valida. Se utilizara 1 pizza.")
-        1
-    }
+    val cantidadPizzas = solicitarCantidadPizzas()
 
     // Notas opcionales
     print("Ingrese notas del pedido (opcional): ")
@@ -184,6 +156,7 @@ fun registrarPedido(
     println("Cantidad: $cantidadPizzas")
     println("Subtotal: ${pedido.subtotal} CLP")
     println("Descuento: ${pedido.descuento} CLP")
+    println("Descuento promocional: ${pedido.descuentoPromocional} CLP")
     println("Impuestos: ${pedido.impuestos} CLP")
     println("Total: ${pedido.calcularTotal()} CLP")
 
@@ -288,6 +261,7 @@ fun mostrarResumenPedido(
 
     println("\n=== RESUMEN DEL PEDIDO ===")
     println("ID del pedido: ${pedido.id}")
+    println("Fecha del pedido: ${pedido.fecha}")
     println("Cliente: ${pedido.cliente.nombre}")
     println("Direccion de entrega: ${pedido.cliente.direccion}")
     println("Telefono: ${pedido.cliente.telefono}")
@@ -298,6 +272,7 @@ fun mostrarResumenPedido(
     println("Cantidad de pizzas: ${pedido.productos.size}")
     println("Subtotal: ${pedido.subtotal} CLP")
     println("Descuento: ${pedido.descuento} CLP")
+    println("Descuento promocional: ${pedido.descuentoPromocional} CLP")
     println("Impuestos: ${pedido.impuestos} CLP")
     val etiquetaTotal = if (pedido.estado == "Rechazado") {
         "Total referencial (pedido rechazado)"
@@ -359,4 +334,72 @@ fun actualizarInventario(
             true
         }
     }
+}
+
+fun solicitarCorreoValido(): String {
+    val patronCorreo = Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
+
+    while (true) {
+        print("Ingrese correo electronico del cliente: ")
+        val ingreso = readlnOrNull()?.trim()
+
+        if (ingreso == null) {
+            println("Sin mas datos. Se utilizara un correo predeterminado.")
+            return "correo@invalido.com"
+        }
+
+        if (ingreso.matches(patronCorreo)) {
+            return ingreso
+        }
+
+        println("Correo no valido. Ingrese nuevamente el correo.")
+    }
+}
+
+fun solicitarCantidadPizzas(): Int {
+    while (true) {
+        print("Ingrese cantidad de pizzas (1-100): ")
+        val ingreso = readlnOrNull()
+
+        if (ingreso == null) {
+            println("Sin mas datos. Se utilizara 1 pizza.")
+            return 1
+        }
+
+        val cantidad = ingreso.toIntOrNull()
+
+        if (cantidad != null && cantidad in 1..100) {
+            return cantidad
+        }
+
+        println("Cantidad no valida. Ingrese un numero entre 1 y 100.")
+    }
+}
+
+fun formatearTelefono(telefono: String): String? {
+    // Permitir digitos y separadores habituales
+    if (!telefono.matches(Regex("""[+0-9()\s-]+"""))) {
+        return null
+    }
+
+    val limpio = telefono.replace(Regex("""[\s()-]"""), "")
+
+    // Formato chileno de celular: +56 9 XXXX XXXX
+    val celular = Regex("""(?:\+?56)?(9\d{8})""").matchEntire(limpio)
+
+    if (celular != null) {
+        val numero = celular.groupValues[1]
+        return "+56 (${numero[0]}) ${numero.substring(1, 5)}-${numero.substring(5)}"
+    }
+
+    // Formato solicitado: +XX (XXX) XXX-XXXX
+    val patron = Regex("""(?:\+?(\d{2}))?(\d{3})(\d{3})(\d{4})""")
+    val coincidencia = patron.matchEntire(limpio) ?: return null
+
+    val codigoPais = coincidencia.groupValues[1].ifEmpty { "56" }
+    val area = coincidencia.groupValues[2]
+    val primeraParte = coincidencia.groupValues[3]
+    val segundaParte = coincidencia.groupValues[4]
+
+    return "+$codigoPais ($area) $primeraParte-$segundaParte"
 }
