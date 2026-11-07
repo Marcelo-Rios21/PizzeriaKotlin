@@ -15,6 +15,14 @@ fun main() {
         return
     }
 
+    // Registrar productos sin duplicados
+    val productosRegistrados = mutableSetOf<Producto>()
+
+    if (!productosRegistrados.add(producto)) {
+        println("Producto duplicado. No se registrara nuevamente.")
+        return
+    }
+
     // Inventario compartido por todos los pedidos del dia
     val inventario = mutableMapOf(
         "Masa" to 10,
@@ -40,13 +48,17 @@ fun main() {
         1
     }
 
+    // Evitar registrar clientes repetidos durante el dia
+    val clientesRegistrados = mutableSetOf<Cliente>()
+
     // Almacenar los pedidos del dia en un arreglo
     val pedidosDelDia: Array<Pedido> = Array(cantidadPedidos) { indice ->
         registrarPedido(
             indice + 1,
             producto,
             inventario,
-            repartidoresDisponibles
+            repartidoresDisponibles,
+            clientesRegistrados
         )
     }
 
@@ -101,7 +113,8 @@ fun registrarPedido(
     idPedido: Int,
     producto: Producto,
     inventario: MutableMap<String, Int>,
-    repartidoresDisponibles: List<Repartidor>
+    repartidoresDisponibles: List<Repartidor>,
+    clientesRegistrados: MutableSet<Cliente>
 ): Pedido {
     println("\n=== REGISTRO DEL PEDIDO $idPedido ===")
 
@@ -132,7 +145,14 @@ fun registrarPedido(
 
     val correo = solicitarCorreoValido()
 
-    val cliente = Cliente(nombre, direccion, telefono, correo)
+    val clienteIngresado = Cliente(nombre, direccion, telefono, correo)
+
+    val cliente = if (clientesRegistrados.add(clienteIngresado)) {
+        clienteIngresado
+    } else {
+        println("Cliente ya registrado. Se utilizaran los datos existentes.")
+        clientesRegistrados.first { it == clienteIngresado }
+    }
 
     println("\n=== CLIENTE REGISTRADO ===")
     val usuario: Usuario = cliente

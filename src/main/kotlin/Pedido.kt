@@ -45,7 +45,33 @@ class Pedido(
         return subtotal - descuento - descuentoPromocional + impuestos
     }
 
+    operator fun component1(): Cliente = cliente
+
+    operator fun component2(): List<Producto> = productos
+
+    operator fun component3(): Double = calcularTotal()
+
     fun cambiarEstado(nuevoEstado: String) {
         estado = nuevoEstado
+    }
+
+    operator fun plus(otro: Pedido): Pedido {
+        require(cliente == otro.cliente) {
+            "Solo se pueden combinar pedidos del mismo cliente."
+        }
+
+        require(fecha == otro.fecha) {
+            "Solo se pueden combinar pedidos de la misma fecha."
+        }
+
+        return Pedido(
+            id = id,
+            cliente = cliente,
+            productos = productos + otro.productos,
+            notas = listOfNotNull(notas, otro.notas)
+                .joinToString(" | ")
+                .takeIf { it.isNotEmpty() },
+            fecha = fecha
+        )
     }
 }
