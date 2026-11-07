@@ -35,6 +35,25 @@ Para verificar la compilacion desde PowerShell, ejecutar:
 - Registro de notas opcionales y notificaciones simuladas.
 - Manejo de errores para precios e inventarios invalidos.
 
+## Funcionalidades de S3
+
+- Validacion del correo electronico mediante expresiones regulares, solicitando nuevamente los datos invalidos.
+- Formato de telefono internacional y formato de celular chileno.
+- Validacion de cantidades de pizzas mediante el rango de 1 a 100.
+- Promocion de ejemplo del 1 al 31 de diciembre de 2026, con descuento adicional del 5% despues del descuento por cantidad.
+- Anotacion personalizada `@Promocionable` aplicada a las clases `Producto` y `Pedido`.
+- Deteccion dinamica de productos promocionables durante el procesamiento.
+- Uso de Reflection para listar campos y metodos de la clase `Pedido`.
+- Implementacion de `equals()` y `hashCode()` en `Cliente` y `Producto`.
+- Prevencion de duplicados mediante colecciones `Set`.
+- Comparacion de productos por nombre y categoria, con categoria predeterminada `pizza`.
+- Sobrecarga del operador `+` para combinar pedidos del mismo cliente y fecha, recalculando descuentos e impuestos.
+- Desestructuracion de `Cliente` en nombre, correo y telefono.
+- Desestructuracion de `Pedido` en cliente, productos y total calculado.
+- Demostracion de conceptos avanzados en la consola al finalizar el reporte diario.
+
+La demostracion S3 utiliza pedidos simulados exclusivamente para calcular y mostrar resultados. No registra pedidos adicionales ni modifica el inventario o los estados de los pedidos reales.
+
 ## Datos de ejemplo
 
 - Pizza: Pepperoni.

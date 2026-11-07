@@ -105,6 +105,98 @@ fun main() {
         println("- Pedido ${pedido.id}: ${pedido.cliente.nombre} - ${pedido.estado}")
     }
 
+    // Demostracion de conceptos S3, sin modificar pedidos reales
+    println("\n=== DEMOSTRACION S3 (SOLO SIMULACION) ===")
+
+    val clienteEjemplo = pedidosDelDia.first().cliente
+
+    // Desestructuracion de Cliente
+    val (nombreCliente, correoCliente, telefonoCliente) = clienteEjemplo
+
+    println(
+        "Cliente desestructurado: " +
+            "$nombreCliente | $correoCliente | $telefonoCliente"
+    )
+
+    // Igualdad de entidades y prevencion de duplicados
+    val clienteEquivalente = Cliente(
+        clienteEjemplo.nombre,
+        clienteEjemplo.direccion,
+        clienteEjemplo.telefono,
+        clienteEjemplo.correo
+    )
+
+    val productoEquivalente = Producto(
+        producto.nombre,
+        producto.precio,
+        producto.ingredientes,
+        producto.categoria
+    )
+
+    println("Cliente == Cliente: ${clienteEjemplo == clienteEquivalente}")
+    println("Producto == Producto: ${producto == productoEquivalente}")
+
+    println(
+        "Clientes unicos en Set: " +
+            setOf(clienteEjemplo, clienteEquivalente).size
+    )
+
+    println(
+        "Productos unicos en Set: " +
+            setOf(producto, productoEquivalente).size
+    )
+
+    // Dos pedidos simulados, independientes del inventario
+    val fechaEjemplo = pedidosDelDia.first().fecha
+
+    val pedidoEjemplo1 = Pedido(
+        id = 1,
+        cliente = clienteEjemplo,
+        productos = List(2) { producto },
+        fecha = fechaEjemplo
+    )
+
+    val pedidoEjemplo2 = Pedido(
+        id = 2,
+        cliente = clienteEjemplo,
+        productos = List(2) { producto },
+        fecha = fechaEjemplo
+    )
+
+    // Sobrecarga del operador +
+    val pedidoCombinado = pedidoEjemplo1 + pedidoEjemplo2
+
+    // Desestructuracion de Pedido
+    val (clientePedido, productosCombinados, totalCombinado) =
+        pedidoCombinado
+
+    println(
+        "Pedido + Pedido: " +
+            "${pedidoEjemplo1.productos.size} + " +
+            "${pedidoEjemplo2.productos.size} = " +
+            "${productosCombinados.size} pizzas"
+    )
+
+    println(
+        "Pedido desestructurado: ${clientePedido.nombre} | " +
+            "${productosCombinados.size} pizzas | " +
+            "$totalCombinado CLP"
+    )
+
+    println(
+        "Descuento por cantidad: ${pedidoCombinado.descuento} CLP"
+    )
+
+    println(
+        "Descuento promocional: " +
+            "${pedidoCombinado.descuentoPromocional} CLP"
+    )
+
+    println(
+        "Simulacion finalizada: sin pedidos adicionales " +
+            "ni cambios de inventario."
+    )
+
     // Inspeccionar dinamicamente la clase Pedido
     mostrarEstructuraClase(Pedido::class.java)
 }
