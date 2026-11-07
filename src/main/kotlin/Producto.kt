@@ -1,5 +1,6 @@
 package org.example
 
+@Promocionable
 class Producto(
     val nombre: String,
     val precio: Double,

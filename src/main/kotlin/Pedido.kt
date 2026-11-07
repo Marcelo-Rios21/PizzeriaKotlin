@@ -2,6 +2,7 @@ package org.example
 
 import java.time.LocalDate
 
+@Promocionable
 class Pedido(
     val id: Int,
     val cliente: Cliente,
@@ -24,7 +25,11 @@ class Pedido(
     private val periodoPromocional =
         LocalDate.of(2026, 12, 1)..LocalDate.of(2026, 12, 31)
 
-    val promocionActiva: Boolean = fecha in periodoPromocional
+    val promocionActiva: Boolean =
+        fecha in periodoPromocional &&
+        productos.any {
+            it.javaClass.isAnnotationPresent(Promocionable::class.java)
+        }
 
     val descuentoPromocional: Double = if (promocionActiva) {
         (subtotal - descuento) * 0.05

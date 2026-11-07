@@ -92,6 +92,9 @@ fun main() {
     for (pedido in rechazados) {
         println("- Pedido ${pedido.id}: ${pedido.cliente.nombre} - ${pedido.estado}")
     }
+
+    // Inspeccionar dinamicamente la clase Pedido
+    mostrarEstructuraClase(Pedido::class.java)
 }
 
 fun registrarPedido(
@@ -149,6 +152,17 @@ fun registrarPedido(
         List(cantidadPizzas) { producto },
         notas
     )
+
+    // Identificar productos promocionables mediante anotaciones
+    val nombresPromocionables = pedido.productos
+        .filter {
+            it.javaClass.isAnnotationPresent(Promocionable::class.java)
+        }
+        .distinctBy { it.nombre }
+        .joinToString { it.nombre }
+        .ifEmpty { "Ninguno" }
+
+    println("Productos promocionables: $nombresPromocionables")
 
     // Calculos centralizados en Pedido
     println("\n=== CALCULO DEL PEDIDO ===")
@@ -402,4 +416,36 @@ fun formatearTelefono(telefono: String): String? {
     val segundaParte = coincidencia.groupValues[4]
 
     return "+$codigoPais ($area) $primeraParte-$segundaParte"
+}
+
+fun mostrarEstructuraClase(tipo: Class<*>) {
+    println("\n=== REFLECTION: ${tipo.simpleName} ===")
+
+    // Propiedades representadas por campos de la clase
+    println("Propiedades:")
+
+    val campos = tipo.declaredFields
+        .filterNot { it.isSynthetic }
+        .sortedBy { it.name }
+
+    for (campo in campos) {
+        println("- ${campo.name}: ${campo.type.simpleName}")
+    }
+
+    // Metodos declarados, incluidos los accesores de Kotlin
+    println("Metodos:")
+
+    val metodos = tipo.declaredMethods
+        .filterNot { it.isSynthetic }
+        .sortedBy { it.name }
+
+    for (metodo in metodos) {
+        val parametros = metodo.parameterTypes
+            .joinToString(", ") { it.simpleName }
+
+        println(
+            "- ${metodo.name}($parametros): " +
+            metodo.returnType.simpleName
+        )
+    }
 }
