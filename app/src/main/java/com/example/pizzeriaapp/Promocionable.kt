@@ -1,4 +1,4 @@
-package org.example
+package com.example.pizzeriaapp
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
