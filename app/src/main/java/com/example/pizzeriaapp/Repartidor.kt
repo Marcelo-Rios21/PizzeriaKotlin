@@ -1,4 +1,4 @@
-package org.example
+package com.example.pizzeriaapp
 
 class Repartidor(
     nombre: String,

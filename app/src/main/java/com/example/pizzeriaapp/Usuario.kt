@@ -1,4 +1,4 @@
-package org.example
+package com.example.pizzeriaapp
 
 open class Usuario(
     val nombre: String,
