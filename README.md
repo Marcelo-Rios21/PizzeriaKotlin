@@ -64,7 +64,7 @@ en dispositivos Android con API 24 y 25.
 
 ## Alcance
 
-La interfaz actual presenta el mensaje de bienvenida.
+La interfaz actual presenta el mensaje de bienvenida y el total calculado de un pedido de ejemplo.
 
 La logica del modelo esta integrada y probada,
 pero no existe todavia una interfaz para gestionar
