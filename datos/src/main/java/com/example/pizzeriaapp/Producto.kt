@@ -1,5 +1,7 @@
 package com.example.pizzeriaapp
 
+import com.example.pizzeriaapp.utilidades.validarPrecioNoNegativo
+
 @Promocionable
 class Producto(
     val nombre: String,
@@ -8,9 +10,7 @@ class Producto(
     val categoria: String = "pizza"
 ) {
     init {
-        require(precio.isFinite() && precio >= 0.0) {
-            "El precio del producto debe ser valido y no negativo."
-        }
+        validarPrecioNoNegativo(precio)
     }
 
     override fun equals(other: Any?): Boolean {
